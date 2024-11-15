@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Продукты</title>
+</head>
+<body>
+    <h1>Список продуктов</h1>
+    <table border="1">
+        <tr>
+            <th>ID продукта</th>
+            <th>Название продукта</th>
+            <th>Количество на складе</th>
+        </tr>
+        {% for product in products %}
+        <tr>
+            <td>{{ product[0] }}</td>
+            <td>{{ product[1] }}</td>
+            <td>{{ product[2] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

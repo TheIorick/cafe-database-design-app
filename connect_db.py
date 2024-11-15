@@ -115,7 +115,6 @@ def get_suppliers():
 @app.route('/')
 def index():
     suppliers = get_suppliers()
-    all_data()
     return render_template('index.html', suppliers=suppliers)
 
 
@@ -187,5 +186,5 @@ def all_data():
 
 if __name__ == '__main__':
     # fill_tables_with_dummy_data()
-    fill_purchase_order_table()
+    # fill_purchase_order_table()
     app.run(debug=True)

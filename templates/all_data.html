@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все данные</title>
+    <style>
+        .table-container {
+            display: flex;
+            justify-content: space-around;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 10px;
+        }
+        th, td {
+            border: 1px solid #c66969;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Все данные из таблиц</h1>
+
+    <div class="table-container">
+        <div>
+            <h2>Поставщики</h2>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Название компании</th>
+                    <th>Цена услуг</th>
+                </tr>
+                {% for supplier in suppliers %}
+                <tr>
+                    <td>{{ supplier[0] }}</td>
+                    <td>{{ supplier[1] }}</td>
+                    <td>{{ supplier[2] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div>
+            <h2>Заказы на покупку</h2>
+            <table>
+                <tr>
+                    <th>ID заказа</th>
+                    <th>Стоимость доставки</th>
+                    <th>Метод оплаты</th>
+                </tr>
+                {% for order in purchase_orders %}
+                <tr>
+                    <td>{{ order[0] }}</td>
+                    <td>{{ order[1] }}</td>
+                    <td>{{ order[2] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div>
+            <h2>Продукты</h2>
+            <table>
+                <tr>
+                    <th>ID продукта</th>
+                    <th>Название продукта</th>
+                    <th>Количество на складе</th>
+                </tr>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product[0] }}</td>
+                    <td>{{ product[1] }}</td>
+                    <td>{{ product[2] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
