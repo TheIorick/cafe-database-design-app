@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers List</title>
+</head>
+<body><a href="/purchase_orders">Посмотреть заказы на покупку</a>
+<a href="/products">Посмотреть продукты</a>
+<a href="/all_data">Посмотреть все данные</a>
+    <h1>Suppliers List</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Company Name</th>
+            <th>Price Services</th>
+        </tr>
+        {% for supplier in suppliers %}
+        <tr>
+            <td>{{ supplier[0] }}</td>
+            <td>{{ supplier[1] }}</td>
+            <td>{{ supplier[2] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

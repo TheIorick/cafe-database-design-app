@@ -6,12 +6,16 @@ class ConstantDBTables:
 
     PURCHASE_ORDER_TABLE = "purchase_order"
     ID_ORDER = "id_order"
+    ID_COMPOSITION = "id_composition"
     COST_DELIVERY_VALUE = "cost_delivery_value"
     PAYMENT_METHOD = "payment_method"
 
+    ORDER_COMPOSITION_TABLE = "order_composition"
+    QUANTITY_ITEM = "quantity_item"
+
     PRODUCTS_TABLE = "products"
     ID_PRODUCTS = "id_products"
-    NAME_PRODUCTS = "name_products"
+    NAME_PRODUCTS = "name_product"
     QUANTITY_PRODUCTS = "quantity_in_warehouse"
 
     PRODUCTS_RECIPES_TABLE = "products_recipes"
@@ -38,7 +42,7 @@ class ConstantDBTables:
     ID_USER = "id_user"
     NAME = "username"
     PASS_HASH = "pass_hash"
-    ROLE = "change_role"
+    ROLE = "role"
 
     ROLE_TABLE = "role"
     ID_ROlE = "id_role"
