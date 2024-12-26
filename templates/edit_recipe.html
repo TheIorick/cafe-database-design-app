@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Редактировать Поставщика</title>
+  <title>Редактировать Рецепт</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='edit_style.css') }}">
 </head>
 <body>
   <div id="webcrumbs">
     <div class="w-[900px] bg-neutral-900 text-neutral-50 rounded-lg shadow p-8">
       <header class="flex justify-between items-center mb-6">
-        <h1 class="text-xl font-title">Редактирование Поставщика</h1>
-        <a href="{{ url_for('suppliers_page') }}" class="text-primary-500 underline">Назад</a>
+        <h1 class="text-xl font-title">Редактирование Рецепта</h1>
+        <a href="{{ url_for('recipes_page') }}" class="text-primary-500 underline">Назад</a>
       </header>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -23,15 +23,15 @@
         {% endif %}
       {% endwith %}
       <section>
-        <h2 class="text-lg mb-4">Редактировать данные поставщика</h2>
-        <form action="{{ url_for('edit_supplier', supplier_id=supplier.id_suppliers) }}" method="POST" class="flex flex-col gap-4">
+        <h2 class="text-lg mb-4">Редактировать данные рецепта</h2>
+        <form action="{{ url_for('edit_recipe', recipe_id=recipe.id_recipes) }}" method="POST" class="flex flex-col gap-4">
           <label class="flex flex-col">
-            <span>Цена доставки</span>
-            <input type="number" name="delivery_price" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ supplier.delivery_price }}" required/>
+            <span>Название блюда</span>
+            <input type="text" name="name_recipe" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ recipe.name_recipe }}" required/>
           </label>
           <label class="flex flex-col">
-            <span>Название компании</span>
-            <input type="text" name="company_name" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ supplier.company_name }}" required/>
+            <span>Время приготовления</span>
+            <input type="number" name="cooking_time" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ recipe.cooking_time }}" required/>
           </label>
           <button type="submit" class="bg-primary-500 text-neutral-50 py-2 px-6 rounded-md mx-auto w-[200px] hover:bg-primary-600">Обновить</button>
         </form>

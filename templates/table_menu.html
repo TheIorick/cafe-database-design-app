@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Table</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='edit_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='tablesort.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='tablesort.number.min.js') }}"></script>
+</head>
+<body>
+  <div id="webcrumbs">
+    <div class="w-[1200px] min-h-[800px] bg-neutral-900 text-neutral-50 rounded-lg shadow-lg p-8">
+      <header class="mb-8 flex justify-between items-center">
+        <h1 class="font-title text-3xl ">Таблица Menu</h1>
+        <a href="{{ url_for('index') }}" class="text-primary-500 underline">На главную</a>
+      </header>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class='mb-6'>
+        <h2 class='text-lg mb-4'>Добавить новое меню</h2>
+        <form action="{{ url_for('create_menu') }}" method="POST" class='flex flex-col gap-4'>
+          <div>
+            <label class='block text-sm mb-1'>ID Блюда (Название блюда)</label>
+            <select name='id_dish' class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none'>
+              {% for dish in dishes %}
+                <option value="{{ dish.id_dish }}">{{ dish.name_dish }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class='block text-sm mb-1'>Дата меню</label>
+            <input type='date' name='date_menu' class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none' required />
+          </div>
+          <div>
+            <label class='block text-sm mb-1'>Название меню</label>
+            <input type='text' name='menu_name' class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none' required />
+          </div>
+          <button type='submit' class='w-[120px] bg-primary-500 text-neutral-50 rounded-md p-2 font-medium hover:bg-primary-600'>Добавить</button>
+        </form>
+      </section>
+          <!-- Filter form -->
+       <section class="mb-6">
+            <h2 class="text-lg mb-2">Фильтр</h2>
+        <form method="GET" action="{{ url_for('filtered_menu_page') }}" class="flex flex-col sm:flex-row gap-4 items-start">
+            <div class="flex flex-col mb-2 sm:mb-0">
+                <label for="id_dish" class="block text-sm mb-1">ID блюда:</label>
+                  <select name='id_dish' id="id_dish" class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none'>
+                    <option value="">Все</option>
+                    {% for dish in dishes %}
+                       <option value="{{ dish.id_dish }}">{{ dish.name_dish }}</option>
+                    {% endfor %}
+                 </select>
+            </div>
+             <div class="flex flex-col mb-2 sm:mb-0">
+                <label for="menu_name" class="block text-sm mb-1">Название меню:</label>
+                 <input type="text" name="menu_name" id="menu_name" class="w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Название меню" />
+            </div>
+             <button type="submit" class="bg-primary-500 text-neutral-50 py-2 px-6 rounded-md mx-auto w-[120px] hover:bg-primary-600">Фильтр</button>
+              <a href="{{ url_for('menu_page') }}" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-50 py-2 px-6 rounded-md mx-auto w-[120px]">Сбросить</a>
+         </form>
+       </section>
+
+      <!-- Menu Table Section -->
+      <section>
+        <h2 class="text-xl font-semibold text-neutral-950 mb-4">Таблица: Menu</h2>
+        <div class="border rounded-md p-4">
+          <table class="table-auto w-full text-neutral-700">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="text-left sort-header" data-sort-method='number'>id_menu</th>
+                <th class="text-left sort-header" data-sort-method='number'>id_dish</th>
+                <th class="text-left sort-header">date_menu</th>
+                <th class="text-left sort-header">menu_name</th>
+                <th class="text-left">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for menu in menus %}
+              <tr>
+                <td>{{ menu.id_menu }}</td>
+                <td>{{ menu.id_dish }}</td>
+                <td>{{ menu.date_menu }}</td>
+                <td>{{ menu.menu_name }}</td>
+                <td>
+                    <a href="{{ url_for('edit_menu', id_menu=menu.id_menu) }}" class="text-yellow-500">Редактировать</a><a> | </a>
+                    <form action="{{ url_for('delete_menu', id_menu=menu.id_menu) }}" method="POST" style="display:inline;">
+                      <button type="submit" class="text-red-500">Удалить</button>
+                    </form>
+                </td>
+              </tr>
+              {% else %}
+                 <tr><td colspan="5">Нет данных</td></tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+       <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             const tables = document.querySelectorAll('.table-auto');
+             tables.forEach(table => {
+                 new Tablesort(table);
+            });
+        });
+    </script>
+</body>
+</html>

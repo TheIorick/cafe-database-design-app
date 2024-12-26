@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактировать Заказ</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='edit_style.css') }}">
+</head>
+<body>
+  <div id="webcrumbs">
+    <div class="w-[900px] bg-neutral-900 text-neutral-50 rounded-lg shadow p-8">
+      <header class="flex justify-between items-center mb-6">
+        <h1 class="text-xl font-title">
+          Редактирование Заказа: "{{ name_product }}" от "{{ company_name }}"
+        </h1>
+        <a href="{{ url_for('purchase_orders_page') }}" class="text-primary-500 underline">Назад</a>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      <section>
+        <h2 class="text-lg mb-4">Редактировать данные заказа</h2>
+        <form action="{{ url_for('edit_purchase_order', id_order=order.id_order) }}" method="POST" class="flex flex-col gap-4">
+          <label class="flex flex-col">
+            <span>ID Продукта</span>
+            <select name="id_products" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+              {% for product in products%}
+                <option value="{{ product.id_products }}" {% if product.id_products == order.id_products %}selected{% endif %}>
+                  {{ product.name_product }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="flex flex-col">
+            <span>ID Поставщика</span>
+            <select name="id_suppliers" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+              {% for supplier in suppliers %}
+                <option value="{{ supplier.id_suppliers }}" {% if supplier.id_suppliers == order.id_suppliers %}selected{% endif %}>
+                  {{ supplier.company_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="flex flex-col">
+            <span>Количество</span>
+            <input type="number" name="quantity_item" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ order.quantity_item }}" required/>
+          </label>
+          <label class="flex flex-col">
+            <span>Цена продукта</span>
+            <input type="number" name="price_product" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ order.price_product }}" required/>
+          </label>
+          <button type="submit" class="bg-primary-500 text-neutral-50 py-2 px-6 rounded-md mx-auto w-[200px] hover:bg-primary-600">Обновить</button>
+        </form>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактировать Меню</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='edit_style.css') }}">
+</head>
+<body>
+  <div id="webcrumbs">
+    <div class="w-[900px] bg-neutral-900 text-neutral-50 rounded-lg shadow p-8">
+      <header class="flex justify-between items-center mb-6">
+        <h1 class="text-xl font-title">Редактирование Меню</h1>
+        <a href="{{ url_for('menu_page') }}" class="text-primary-500 underline">Назад</a>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      <section>
+        <h2 class="text-lg mb-4">Редактировать данные меню</h2>
+        <form action="{{ url_for('edit_menu', id_menu=menu.id_menu) }}" method="POST" class="flex flex-col gap-4">
+          <label class="flex flex-col">
+            <span>ID Блюда</span>
+            <select name="id_dish" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+              {% for dish in dishes %}
+                <option value="{{ dish.id_dish }}" {% if dish.id_dish == menu.id_dish %}selected{% endif %}>
+                  {{ dish.name_dish }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="flex flex-col">
+            <span>Дата меню</span>
+            <input type="date" name="date_menu" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ menu.date_menu }}" required/>
+          </label>
+          <label class="flex flex-col">
+            <span>Название меню</span>
+            <input type="text" name="menu_name" class="bg-neutral-800 text-neutral-50 p-2 rounded-md border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500" value="{{ menu.menu_name }}" required/>
+          </label>
+          <button type="submit" class="bg-primary-500 text-neutral-50 py-2 px-6 rounded-md mx-auto w-[200px] hover:bg-primary-600">Обновить</button>
+        </form>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

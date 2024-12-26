@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Таблица Dishes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='edit_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='tablesort.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='tablesort.number.min.js') }}"></script>
+</head>
+<body>
+  <div id="webcrumbs">
+    <div class="w-[1200px] min-h-[800px] bg-neutral-900 text-neutral-50 rounded-lg shadow-lg p-8">
+      <header class="mb-8 flex justify-between items-center">
+        <h1 class="font-title text-3xl ">Таблица Dishes</h1>
+        <a href="{{ url_for('index') }}" class="text-primary-500 underline">На главную</a>
+      </header>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class='mb-6'>
+        <h2 class='text-lg mb-4'>Добавить новое блюдо</h2>
+        <form action="{{ url_for('create_dish') }}" method="POST" class='flex flex-col gap-4'>
+          <div>
+            <label class='block text-sm mb-1'>ID Рецепта</label>
+            <select name='id_recipes' class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none'>
+              {% for recipe in recipes %}
+                <option value="{{ recipe.id_recipes }}">{{ recipe.name_recipe }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class='block text-sm mb-1'>Категория</label>
+            <input type='text' name='category' class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none' required/>
+          </div>
+          <div>
+            <label class='block text-sm mb-1'>Название блюда</label>
+            <input type='text' name='name_dish' class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none' required/>
+          </div>
+          <div>
+            <label class='block text-sm mb-1'>Цена блюда</label>
+            <input type='number' name='price_dish' class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none' required/>
+          </div>
+          <button type='submit' class='w-[120px] bg-primary-500 text-neutral-50 rounded-md p-2 font-medium hover:bg-primary-600'>Добавить</button>
+        </form>
+      </section>
+        <!-- Filter form -->
+       <section class="mb-6">
+            <h2 class="text-lg mb-2">Фильтр</h2>
+        <form method="GET" action="{{ url_for('filtered_dishes_page') }}" class="flex flex-col sm:flex-row gap-4 items-start">
+            <div class="flex flex-col mb-2 sm:mb-0">
+                <label for="id_recipes" class="block text-sm mb-1">ID рецепта:</label>
+                  <select name='id_recipes' id="id_recipes" class='w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none'>
+                    <option value="">Все</option>
+                    {% for recipe in recipes %}
+                       <option value="{{ recipe.id_recipes }}">{{ recipe.name_recipe }}</option>
+                    {% endfor %}
+                 </select>
+            </div>
+             <div class="flex flex-col mb-2 sm:mb-0">
+                <label for="category" class="block text-sm mb-1">Категория:</label>
+                 <input type="text" name="category" id="category" class="w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Категория" />
+            </div>
+            <div class="flex flex-col mb-2 sm:mb-0">
+                <label for="name_dish" class="block text-sm mb-1">Название блюда:</label>
+                <input type="text" name="name_dish" id="name_dish" class="w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Название блюда" />
+            </div>
+             <div class="flex flex-col mb-2 sm:mb-0">
+                 <label for="price_dish_min" class="block text-sm mb-1">Цена блюда от:</label>
+                <input type="number" name="price_dish_min" id="price_dish_min" class="w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none" placeholder="Цена от"/>
+                 <label for="price_dish_max" class="block text-sm mb-1">Цена блюда до:</label>
+                <input type="number" name="price_dish_max" id="price_dish_max" class="w-full bg-neutral-800 rounded-md p-2 text-neutral-50 border border-neutral-700 focus:ring-2 focus:ring-primary-500 focus:outline-none"  placeholder="Цена до"/>
+            </div>
+             <button type="submit" class="bg-primary-500 text-neutral-50 py-2 px-6 rounded-md mx-auto w-[120px] hover:bg-primary-600">Фильтр</button>
+              <a href="{{ url_for('dishes_page') }}" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-50 py-2 px-6 rounded-md mx-auto w-[120px]">Сбросить</a>
+         </form>
+       </section>
+
+      <!-- Dishes Table Section -->
+      <section>
+        <h2 class="text-xl font-semibold text-neutral-950 mb-4">Таблица: Dishes</h2>
+        <div class="border rounded-md p-4">
+          <table class="table-auto w-full text-neutral-700">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="text-left sort-header" data-sort-method='number'>id_dish</th>
+                <th class="text-left sort-header" data-sort-method='number'>id_recipes</th>
+                <th class="text-left sort-header">category</th>
+                <th class="text-left sort-header">name_dish</th>
+                 <th class="text-left sort-header" data-sort-method='number'>price_dish</th>
+                <th class="text-left">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for dish in dishes %}
+              <tr>
+                <td>{{ dish.id_dish }}</td>
+                <td>{{ dish.id_recipes }}</td>
+                <td>{{ dish.category }}</td>
+                <td>{{ dish.name_dish }}</td>
+                 <td>{{ dish.price_dish }}</td>
+                <td>
+                    <a href="{{ url_for('edit_dish', id_dish=dish.id_dish) }}" class="text-yellow-500">Редактировать</a><a> | </a>
+                    <form action="{{ url_for('delete_dish', id_dish=dish.id_dish) }}" method="POST" style="display:inline;">
+                      <button type="submit" class="text-red-500">Удалить</button>
+                    </form>
+                </td>
+              </tr>
+              {% else %}
+                   <tr><td colspan="6">Нет данных</td></tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+       <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             const tables = document.querySelectorAll('.table-auto');
+             tables.forEach(table => {
+                 new Tablesort(table);
+            });
+        });
+    </script>
+</body>
+</html>
