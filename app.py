@@ -1,12 +1,10 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from controllers import *  # Import all controllers
 from config import AppConfig
 from data_manager import DataManager
 from utils import *  # Import utility functions
+from flask_sqlalchemy import SQLAlchemy
 
-
-db = SQLAlchemy()
 data_manager = DataManager()
 
 
@@ -16,14 +14,14 @@ def create_app():
     db.init_app(app)  # Initialize SQLAlchemy with the Flask app
 
     # Register Controllers
-    IndexController.register_routes(app, db)
-    SupplierController.register_routes(app, db)
-    PurchaseOrderController.register_routes(app, db)
-    ProductController.register_routes(app, db)
-    RecipeController.register_routes(app, db)
-    RecipeCompositionController.register_routes(app, db)
-    DishController.register_routes(app, db)
-    MenuController.register_routes(app, db)
+    IndexController.register_routes(app)
+    SupplierController.register_routes(app)
+    PurchaseOrderController.register_routes(app)
+    ProductController.register_routes(app)
+    RecipeController.register_routes(app)
+    RecipeCompositionController.register_routes(app)
+    DishController.register_routes(app)
+    MenuController.register_routes(app)
 
     return app
 

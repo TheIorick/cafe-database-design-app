@@ -27,7 +27,7 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
-            max-width: 800px;
+            max-width: 1000px;
             border-radius: 10px;
         }
         .close {
@@ -160,6 +160,7 @@
                     .then(response => response.text())
                     .then(data => {
                          modalContent.innerHTML = data;
+                         attachModalFormListeners(recipeId); // Вызываем здесь
                     });
 
             }
@@ -172,6 +173,82 @@
              if (event.target == modal) {
                  modal.style.display = "none";
             }
+        }
+         function attachModalFormListeners(recipeId) {
+              const modalContent = document.getElementById('modalContent');
+
+            // Create form
+             const createForm = modalContent.querySelector('#create-form-recipe');
+                if(createForm) {
+                    createForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        fetch(`/create_recipe_composition/${recipeId}`, {
+                            method: 'POST',
+                            body: new FormData(createForm)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                fetch(`/recipe_composition_modal/${recipeId}`)
+                                .then(response => response.text())
+                                .then(data => {
+                                    modalContent.innerHTML = data;
+                                    attachModalFormListeners(recipeId);
+                                });
+                            } else {
+                                alert('Ошибка при создании');
+                            }
+                        });
+                    });
+                }
+              // Edit forms
+              modalContent.querySelectorAll('.edit-form-recipe').forEach(editForm => {
+                    editForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        const compositionId = editForm.dataset.compositionId;
+                        fetch(`/edit_recipe_composition/${compositionId}/${recipeId}`, {
+                                method: 'POST',
+                                body: new FormData(editForm)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                           if (data.success) {
+                                fetch(`/recipe_composition_modal/${recipeId}`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        modalContent.innerHTML = data;
+                                        attachModalFormListeners(recipeId);
+                                    });
+                            } else {
+                                 alert('Ошибка при редактировании');
+                            }
+                        });
+                    });
+              });
+
+            // Delete forms
+             modalContent.querySelectorAll('.delete-form-recipe').forEach(deleteForm => {
+                deleteForm.addEventListener('submit', function (event) {
+                     event.preventDefault();
+                    const compositionId = deleteForm.dataset.compositionId;
+                     fetch(`/delete_recipe_composition/${compositionId}/${recipeId}`, {
+                        method: 'POST'
+                     })
+                        .then(response => response.json())
+                        .then(data => {
+                             if (data.success) {
+                                  fetch(`/recipe_composition_modal/${recipeId}`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        modalContent.innerHTML = data;
+                                        attachModalFormListeners(recipeId);
+                                  });
+                            } else {
+                                 alert('Ошибка при удалении');
+                             }
+                        });
+                });
+            });
         }
     </script>
 </body>

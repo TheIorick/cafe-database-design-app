@@ -1,24 +1,19 @@
 from flask import flash
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import *
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from psycopg2 import errors
 
+db = SQLAlchemy()
 
-class BaseModel:  # Убрали наследование db.Model
+class BaseModel(db.Model):
     __abstract__ = True
 
-    def __init__(self, db):  # Добавил в метод __init__
-        self.db = db
-
-    def query(self): # Сделали query - методом экземпляра
-        return self.db.session.query(self.__class__)
+    @classmethod
+    def read_all(cls):
+        return db.session.query(cls).all()
 
     @classmethod
-    def read_all(cls, db):
-        return cls.query().all()
-
-    @classmethod
-    def clear_table(cls, db):
+    def clear_table(cls):
         try:
             num_rows_deleted = db.session.query(cls).delete()
             db.session.commit()
@@ -29,8 +24,8 @@ class BaseModel:  # Убрали наследование db.Model
             flash(f"Ошибка: очистка {cls.__tablename__} не удалась", "error")
 
     @classmethod
-    def create(cls, db, **kwargs):
-        new_instance = cls(db, **kwargs)  # Передал db в __init__
+    def create(cls, **kwargs):
+        new_instance = cls(**kwargs)
         db.session.add(new_instance)
         try:
             db.session.commit()
@@ -46,8 +41,8 @@ class BaseModel:  # Убрали наследование db.Model
             return None
 
     @classmethod
-    def update(cls, db, instance_id, **kwargs):
-        instance = cls.query().get(instance_id)
+    def update(cls, instance_id, **kwargs):
+        instance = db.session.query(cls).get(instance_id)
         if not instance:
             flash(f"{cls.__name__} с ID {instance_id} не существует.", 'error')
             return None
@@ -88,9 +83,9 @@ class BaseModel:  # Убрали наследование db.Model
         return instance
 
     @classmethod
-    def delete(cls, db, instance_id):
+    def delete(cls, instance_id):
         try:
-            instance = cls.query().get(instance_id)
+            instance = db.session.query(cls).get(instance_id)
             if instance:
                 db.session.delete(instance)
                 db.session.commit()
@@ -114,11 +109,6 @@ class Supplier(BaseModel):
     delivery_price = Column(Integer, nullable=False)
     company_name = Column(String(55), unique=True, nullable=False)
 
-    def __init__(self, db, **kwargs):
-        super().__init__(db)
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
 
 class PurchaseOrder(BaseModel):
     __tablename__ = "purchase_order"
@@ -129,10 +119,6 @@ class PurchaseOrder(BaseModel):
                              nullable=False)
     quantity_item = Column(Integer, nullable=True)
     price_product = Column(Integer, nullable=False)
-    def __init__(self, db, **kwargs):
-        super().__init__(db)
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
 
 class Product(BaseModel):
@@ -142,22 +128,12 @@ class Product(BaseModel):
     quantity_in_warehouse = Column(Integer, nullable=False)
     unit = Column(String(255), nullable=False)
 
-    def __init__(self, db, **kwargs):
-        super().__init__(db)
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
 class RecipeComposition(BaseModel):
     __tablename__ = 'recipe_composition'
-
     id_composition = Column(Integer, primary_key=True, autoincrement=True)
     id_products = Column(Integer, ForeignKey('products.id_products'), nullable=False)
     id_recipes = Column(Integer, ForeignKey('recipes.id_recipes'), nullable=False)
     quantity_for_recipe = Column(Integer, nullable=False)
-    def __init__(self, db, **kwargs):
-        super().__init__(db)
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
 
 class Recipe(BaseModel):
@@ -165,10 +141,6 @@ class Recipe(BaseModel):
     id_recipes = Column(Integer, primary_key=True)
     name_recipe = Column(String(55), unique=True, nullable=False)
     cooking_time = Column(Integer, nullable=False)
-    def __init__(self, db, **kwargs):
-        super().__init__(db)
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
 
 class Dish(BaseModel):
@@ -178,11 +150,6 @@ class Dish(BaseModel):
     category = Column(String(55), nullable=False)
     name_dish = Column(String(55), unique=True, nullable=False)
     price_dish = Column(Integer, nullable=False)
-    def __init__(self, db, **kwargs):
-        super().__init__(db)
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
 
 class Menu(BaseModel):
     __tablename__ = 'menu'
@@ -190,7 +157,3 @@ class Menu(BaseModel):
     id_dish = Column(Integer, ForeignKey('dishes.id_dish'), nullable=False)
     date_menu = Column(Date, nullable=False)
     menu_name = Column(String(255), unique=True, nullable=False)
-    def __init__(self, db, **kwargs):
-        super().__init__(db)
-        for key, value in kwargs.items():
-            setattr(self, key, value)

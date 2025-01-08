@@ -1,14 +1,13 @@
 from flask import request, redirect, render_template, url_for
 from models import *
 from utils import apply_filters, validate_positive_int, render_with_message, flash_redirect, handle_form_errors
-from app import db
 
 class DishController:
     @staticmethod
-    def register_routes(app, db):
+    def register_routes(app):
         @app.route('/dishes')
         def dishes_page():
-            return render_with_message('table_dishes.html', dishes=Dish.read_all(db), recipes=Recipe.read_all(db))
+            return render_with_message('table_dishes.html', dishes=Dish.read_all(), recipes=Recipe.read_all())
 
         @app.route('/filtered_dishes', methods=['GET'])
         def filtered_dishes_page():
@@ -21,9 +20,9 @@ class DishController:
                     'max': request.args.get('price_dish_max', type=int)
                 }
             }
-            query = Dish.query(db)
+            query = db.session.query(Dish)
             dishes = apply_filters(query, filters).all()
-            return render_with_message('table_dishes.html', dishes=dishes, recipes=Recipe.read_all(db))
+            return render_with_message('table_dishes.html', dishes=dishes, recipes=Recipe.read_all())
 
         @app.route('/create_dish', methods=['POST'])
         def create_dish():
@@ -36,7 +35,7 @@ class DishController:
             if not price_dish:
                 return redirect(url_for('dishes_page'))
 
-            Dish.create(db,
+            Dish.create(
                 id_recipes=form_data['id_recipes'],
                 category=form_data['category'],
                 name_dish=form_data['name_dish'],
@@ -46,8 +45,8 @@ class DishController:
 
         @app.route('/edit_dish/<int:id_dish>', methods=['GET', 'POST'])
         def edit_dish(id_dish):
-            dish = Dish.query(db).get_or_404(id_dish)
-            recipes = Recipe.read_all(db)
+            dish = db.session.query(Dish).get_or_404(id_dish)
+            recipes = Recipe.read_all()
             if request.method == 'POST':
                 form_data = request.form
                 error = handle_form_errors(form_data, ['id_recipes', 'category', 'name_dish', 'price_dish'],
@@ -56,11 +55,11 @@ class DishController:
                     return error
 
                 price_dish = validate_positive_int(form_data['price_dish'], 'Цена блюда не может быть отрицательной',
-                                                      'edit_dish', dish=dish, recipes=recipes)
+                                                      'edit_dish') # Убрали dish=dish, recipes=recipes
                 if not price_dish:
                     return render_template('edit_dish.html', dish=dish, recipes=recipes)
 
-                Dish.update(db, id_dish, id_recipes=form_data['id_recipes'],
+                Dish.update(id_dish, id_recipes=form_data['id_recipes'],
                            category=form_data['category'],
                            name_dish=form_data['name_dish'],
                            price_dish=price_dish)
@@ -69,5 +68,5 @@ class DishController:
 
         @app.route('/delete_dish/<int:id_dish>', methods=['POST'])
         def delete_dish(id_dish):
-            Dish.delete(db, id_dish)
+            Dish.delete(id_dish)
             return flash_redirect('Блюдо успешно удалено!', 'success', 'dishes_page')

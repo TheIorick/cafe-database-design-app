@@ -1,14 +1,14 @@
 from flask import request, redirect, render_template, url_for
 from models import *
 from utils import apply_filters, validate_positive_int, render_with_message, flash_redirect, handle_form_errors
-from app import db
+# from app import db # больше не требуется импортировать
 
 class ProductController:
     @staticmethod
-    def register_routes(app, db):
+    def register_routes(app): #Удаляем db
         @app.route('/products')
         def products_page():
-            return render_with_message('table_product.html', products=Product.read_all(db))
+            return render_with_message('table_product.html', products=Product.read_all())
 
         @app.route('/filtered_products', methods=['GET'])
         def filtered_products_page():
@@ -20,7 +20,7 @@ class ProductController:
                 },
                 Product.unit: request.args.get('unit', type=str)
             }
-            query = Product.query(db)
+            query = db.session.query(Product)
             products = apply_filters(query, filters).all()
             return render_with_message('table_product.html', products=products)
 
@@ -37,7 +37,7 @@ class ProductController:
             if not quantity_in_warehouse:
                 return redirect(url_for('products_page'))
 
-            new_product = Product.create(db, name_product=form_data['name_product'],
+            new_product = Product.create(name_product=form_data['name_product'],
                                          quantity_in_warehouse=quantity_in_warehouse,
                                          unit=form_data['unit'])
             db.session.add(new_product)
@@ -46,7 +46,7 @@ class ProductController:
 
         @app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
         def edit_product(product_id):
-            product = Product.query(db).get_or_404(product_id)
+            product = db.session.query(Product).get_or_404(product_id)
             if request.method == 'POST':
                 form_data = request.form
                 error = handle_form_errors(form_data, ['name_product', 'quantity_in_warehouse', 'unit'],
@@ -55,11 +55,11 @@ class ProductController:
                     return error
                 quantity_in_warehouse = validate_positive_int(form_data['quantity_in_warehouse'],
                                                           'Количество на складе не может быть отрицательным',
-                                                          'edit_product', product=product)
+                                                          'edit_product') # Убрали product=product
                 if not quantity_in_warehouse:
                     return render_template('edit_product.html', product=product)
 
-                Product.update(db, product_id, name_product=form_data['name_product'],
+                Product.update(product_id, name_product=form_data['name_product'],
                               quantity_in_warehouse=quantity_in_warehouse,
                               unit=form_data['unit'])
                 return redirect(url_for('products_page'))
@@ -67,7 +67,7 @@ class ProductController:
 
         @app.route('/delete_product/<int:product_id>', methods=['POST'])
         def delete_product(product_id):
-            product = Product.query(db).get_or_404(product_id)
+            product = db.session.query(Product).get_or_404(product_id)
             db.session.delete(product)
             db.session.commit()
             return flash_redirect('Продукт успешно удален!', 'success', 'products_page')
