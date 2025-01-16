@@ -1,4 +1,6 @@
 from flask import request, redirect, url_for, render_template
+from sqlalchemy import func
+
 from models import *
 from utils import apply_filters, validate_positive_int, render_with_message, flash_redirect, handle_form_errors
 # from app import db - удаляем импорт db
@@ -60,3 +62,12 @@ class RecipeController:
         def delete_recipe(recipe_id):
             Recipe.delete(recipe_id)
             return flash_redirect('Рецепт успешно удален!', 'success', 'recipes_page')
+
+        @app.route('/recipe_statistics')
+        def recipe_statistics():
+            total_recipes = db.session.query(Recipe).count()
+            average_cooking_time = db.session.query(func.avg(Recipe.cooking_time)).scalar()
+            if average_cooking_time is not None:
+                average_cooking_time = round(average_cooking_time, 2)
+            return render_with_message('recipe_statistics.html', total_recipes=total_recipes,
+                                       average_cooking_time=average_cooking_time)

@@ -9,7 +9,7 @@
     <script src="{{ url_for('static', filename='tablesort.min.js') }}"></script>
     <script src="{{ url_for('static', filename='tablesort.number.min.js') }}"></script>
      <style>
-        /* Стили для модального окна */
+
         .modal {
             display: none;
             position: fixed;
@@ -49,7 +49,11 @@
     <div class="w-[1200px] min-h-[800px] bg-neutral-900 text-neutral-50 rounded-lg shadow-lg p-8">
       <header class="mb-8 flex justify-between items-center">
         <h1 class="font-title text-3xl ">Таблица Рецепты</h1>
-        <a href="{{ url_for('index') }}" class="text-primary-500 underline">На главную</a>
+        <div>
+          <a href="{{ url_for('index') }}" class="text-primary-500 underline mr-4">На главную</a>
+           <a href="{{ url_for('recipe_statistics') }}" class="text-green-500 underline">Статистика</a>
+        </div>
+
       </header>
 
       <!-- Flash Messages -->
@@ -100,7 +104,7 @@
 
       <!-- Recipes Table Section -->
       <section>
-        <h2 class="text-xl font-semibold text-neutral-950 mb-4">Таблица: Recipes</h2>
+        <h2 class="text-xl font-semibold text-neutral-950 mb-4"></h2>
         <div class="border rounded-md p-4">
           <table class="table-auto w-full text-neutral-700">
             <thead>
