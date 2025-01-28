@@ -50,40 +50,6 @@
             </div>
         </section>
 
-        <!-- Purchase Orders Table Section -->
-        <section class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="p-4">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
-                    <a href="{{ url_for('purchase_orders_page') }}" class="text-blue-600 hover:text-blue-800">Заказы</a>
-                </h2>
-                <div class="table-container">
-                    <table class="table-auto w-full text-gray-700" data-tablesort-id="purchase_order_table">
-                        <thead>
-                         <tr class="bg-gray-200">
-                            <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>id</th>
-                            <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>id продукта</th>
-                            <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>id поставщика</th>
-                            <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>Количество</th>
-                            <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>Цена</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for order in purchase_orders %}
-                            <tr>
-                                <td class="px-4 py-2">{{ order.id_order }}</td>
-                                <td class="px-4 py-2">{{ order.id_products }}</td>
-                                <td class="px-4 py-2">{{ order.id_suppliers }}</td>
-                                <td class="px-4 py-2">{{ order.quantity_item }}</td>
-                                <td class="px-4 py-2">{{ order.price_product }}</td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="5">Нет данных</td></tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
 
         <!-- Products Table Section -->
          <section class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -117,40 +83,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Product Recipes Table Section -->
-         <section class="bg-white shadow-md rounded-lg overflow-hidden">
-             <div class="p-4">
-                    <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
-                     <a href="{{ url_for('recipe_compositions_page') }}"
-                        class="text-blue-600 hover:text-blue-800">Состав рецепта</a>
-                     </h2>
-                 <div class="table-container">
-                     <table class="table-auto w-full text-gray-700" data-tablesort-id="recipe_composition_table">
-                         <thead>
-                         <tr class="bg-gray-200">
-                             <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>id</th>
-                             <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>id продукта</th>
-                             <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>id рецепта</th>
-                             <th class="px-4 py-2 text-left sort-header" data-sort-method='number'>Количество</th>
-                         </tr>
-                         </thead>
-                         <tbody>
-                         {% for product_recipe in product_recipes %}
-                             <tr>
-                                 <td class="px-4 py-2">{{ product_recipe.id_composition }}</td>
-                                 <td class="px-4 py-2">{{ product_recipe.id_products }}</td>
-                                 <td class="px-4 py-2">{{ product_recipe.id_recipes }}</td>
-                                 <td class="px-4 py-2">{{ product_recipe.quantity_for_recipe }}</td>
-                             </tr>
-                             {% else %}
-                            <tr><td colspan="4">Нет данных</td></tr>
-                         {% endfor %}
-                         </tbody>
-                     </table>
-                 </div>
-             </div>
-         </section>
 
         <!-- Recipes Table Section -->
          <section class="bg-white shadow-md rounded-lg overflow-hidden">

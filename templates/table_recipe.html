@@ -8,13 +8,52 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='tablesort.min.js') }}"></script>
     <script src="{{ url_for('static', filename='tablesort.number.min.js') }}"></script>
+     <style>
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 1000px;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
   <div id="webcrumbs">
     <div class="w-[1200px] min-h-[800px] bg-neutral-900 text-neutral-50 rounded-lg shadow-lg p-8">
       <header class="mb-8 flex justify-between items-center">
         <h1 class="font-title text-3xl ">Таблица Рецепты</h1>
-        <a href="{{ url_for('index') }}" class="text-primary-500 underline">На главную</a>
+        <div>
+          <a href="{{ url_for('index') }}" class="text-primary-500 underline mr-4">На главную</a>
+           <a href="{{ url_for('recipe_statistics') }}" class="text-green-500 underline">Статистика</a>
+        </div>
+
       </header>
 
       <!-- Flash Messages -->
@@ -65,7 +104,7 @@
 
       <!-- Recipes Table Section -->
       <section>
-        <h2 class="text-xl font-semibold text-neutral-950 mb-4">Таблица: Recipes</h2>
+        <h2 class="text-xl font-semibold text-neutral-950 mb-4"></h2>
         <div class="border rounded-md p-4">
           <table class="table-auto w-full text-neutral-700">
             <thead>
@@ -84,6 +123,7 @@
                 <td>{{ recipe.cooking_time }}</td>
                 <td>
                   <a href="{{ url_for('edit_recipe', recipe_id=recipe.id_recipes) }}" class="text-yellow-500">Редактировать</a> |
+                    <button onclick="openModal({{ recipe.id_recipes }})" class="text-blue-500">Состав</button> |
                   <form action="{{ url_for('delete_recipe', recipe_id=recipe.id_recipes) }}" method="POST" style="display:inline;">
                     <button type="submit" class="text-red-500">Удалить</button>
                   </form>
@@ -98,6 +138,15 @@
       </section>
     </div>
   </div>
+
+        <!-- Modal for Recipe Composition -->
+    <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">×</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
       <script>
         document.addEventListener('DOMContentLoaded', () => {
              const tables = document.querySelectorAll('.table-auto');
@@ -105,6 +154,106 @@
                  new Tablesort(table);
             });
         });
+
+            function openModal(recipeId) {
+                 const modal = document.getElementById('recipeModal');
+                const modalContent = document.getElementById('modalContent');
+                modal.style.display = 'block';
+                // Load the filtered composition table
+                fetch(`/recipe_composition_modal/${recipeId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                         modalContent.innerHTML = data;
+                         attachModalFormListeners(recipeId); // Вызываем здесь
+                    });
+
+            }
+            function closeModal() {
+                const modal = document.getElementById('recipeModal');
+                 modal.style.display = 'none';
+            }
+        window.onclick = function(event) {
+             const modal = document.getElementById('recipeModal');
+             if (event.target == modal) {
+                 modal.style.display = "none";
+            }
+        }
+         function attachModalFormListeners(recipeId) {
+              const modalContent = document.getElementById('modalContent');
+
+            // Create form
+             const createForm = modalContent.querySelector('#create-form-recipe');
+                if(createForm) {
+                    createForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        fetch(`/create_recipe_composition/${recipeId}`, {
+                            method: 'POST',
+                            body: new FormData(createForm)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                fetch(`/recipe_composition_modal/${recipeId}`)
+                                .then(response => response.text())
+                                .then(data => {
+                                    modalContent.innerHTML = data;
+                                    attachModalFormListeners(recipeId);
+                                });
+                            } else {
+                                alert('Ошибка при создании');
+                            }
+                        });
+                    });
+                }
+              // Edit forms
+              modalContent.querySelectorAll('.edit-form-recipe').forEach(editForm => {
+                    editForm.addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        const compositionId = editForm.dataset.compositionId;
+                        fetch(`/edit_recipe_composition/${compositionId}/${recipeId}`, {
+                                method: 'POST',
+                                body: new FormData(editForm)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                           if (data.success) {
+                                fetch(`/recipe_composition_modal/${recipeId}`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        modalContent.innerHTML = data;
+                                        attachModalFormListeners(recipeId);
+                                    });
+                            } else {
+                                 alert('Ошибка при редактировании');
+                            }
+                        });
+                    });
+              });
+
+            // Delete forms
+             modalContent.querySelectorAll('.delete-form-recipe').forEach(deleteForm => {
+                deleteForm.addEventListener('submit', function (event) {
+                     event.preventDefault();
+                    const compositionId = deleteForm.dataset.compositionId;
+                     fetch(`/delete_recipe_composition/${compositionId}/${recipeId}`, {
+                        method: 'POST'
+                     })
+                        .then(response => response.json())
+                        .then(data => {
+                             if (data.success) {
+                                  fetch(`/recipe_composition_modal/${recipeId}`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        modalContent.innerHTML = data;
+                                        attachModalFormListeners(recipeId);
+                                  });
+                            } else {
+                                 alert('Ошибка при удалении');
+                             }
+                        });
+                });
+            });
+        }
     </script>
 </body>
 </html>
